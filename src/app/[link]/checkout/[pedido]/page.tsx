@@ -76,7 +76,6 @@ export default function Pedidos({ params }: { params: { pedido: string } }) {
                   </div>
                   <div>
                     <p className="flex items-center gap-3">Forma de Pagamento: {pedido.formaPagamento}</p>
-                    <p>{pedido.id}</p>
                     {pedido.clienteTroco && <p className="flex items-center gap-3">Troco: {formatarReal(pedido.clienteTroco)} </p>}
                     <p className="flex items-center gap-3">Total Pedido: {formatarReal(pedido.totalPedido)}</p>
                   </div>
