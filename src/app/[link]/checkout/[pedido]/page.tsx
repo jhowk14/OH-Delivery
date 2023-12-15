@@ -53,7 +53,6 @@ export default function Pedidos({ params }: { params: { pedido: string } }) {
           }
         </>
       );
-  
     return (
       <div className='container mx-auto py-4 px-2'>
         {pedido && (
