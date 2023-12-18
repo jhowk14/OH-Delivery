@@ -1,23 +1,23 @@
-# Use an official Node.js LTS image as a parent image
+# Use the official Node.js image as base
 FROM node:18
 
-# Set the working directory to /app
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the working directory
+# Copy package.json and package-lock.json to the container
 COPY package*.json ./
 
-# Install any needed packages specified in package.json
+# Install dependencies
 RUN npm install
 
-# Copy the current directory contents into the container at /app
+# Copy the rest of the application code
 COPY . .
 
-# Build your Next.js app
+# Build TypeScript code
 RUN npm run build
 
-# Expose port 3000
+# Expose the port that the app will run on
 EXPOSE 3000
 
-# Command to run your application
+# Command to run the application
 CMD ["npm", "start"]

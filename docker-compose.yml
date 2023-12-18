@@ -1,0 +1,13 @@
+version: '1'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: front-oh-pedidos
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
