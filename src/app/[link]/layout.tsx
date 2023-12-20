@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: { link: string } })
     const response = await axios.get(`${apiUrl}/empresa/${params.link}`);
     if (response.status === 200) {
       const responseData: Empresas = response.data;
-      useEmpresaStore.setState({ empresa: responseData });
+      useEmpresaStore.getState().setEmpresa(responseData)
       return {
         title: responseData.EmprNome,
         description: `Empresa ${responseData.EmprNome}`,
@@ -38,7 +38,7 @@ export default async function RootLayout({ children, params }: { children: React
     const response = await axios.get(`${apiUrl}/empresa/${params.link}`);
     if (response.status === 200) {
       const responseData: Empresas = response.data;
-      useEmpresaStore.setState({ empresa: responseData });
+      useEmpresaStore.getState().setEmpresa(responseData);
 
       return (
         <>

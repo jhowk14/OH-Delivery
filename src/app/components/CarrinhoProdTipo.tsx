@@ -9,10 +9,10 @@ import { useCookies } from "next-client-cookies";
 import { useCarrinho } from "../states/carrinho/useCart";
 import formatarReal from "../utils/fomatToReal";
 import { FaTrash } from "react-icons/fa";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Dialog, DialogContent } from "@mui/material";
 
-export default function ProdutoGrupoTipo({ carrinhoData }: { carrinhoData: CarrinhoData }) {
+const ProdutoGrupoTipo = memo(function ProdutoGrupoTipo({ carrinhoData }: { carrinhoData: CarrinhoData }) {
   const cookies = useCookies()
   const { addCarrinho: setCarrinhoData} = useCarrinho()
   const [quantidade, setQuantidade] = useState(carrinhoData.CarQtd);
@@ -148,3 +148,5 @@ const qtdProdutos = carrinhoData.CarrinhoItens.filter(it => it.Produto.ProdClass
 </MotionAnimate>
   );
 }
+)
+export default ProdutoGrupoTipo

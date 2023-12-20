@@ -3,15 +3,14 @@ import { PiBasketBold} from 'react-icons/pi';
 import { Grupo } from '../../../../types/Grupos';
 import { useRouter } from 'next/navigation';
 import { useGrupo } from '@/app/states/grupo/useGrupo';
-import { BiArrowBack } from 'react-icons/bi';
 // @ts-ignore
-import { MotionAnimate } from 'react-motion-animate'
+import { MotionAnimate } from 'react-motion-animate';
 import { useEmpresaStore } from '@/app/states/empresa/useEmpresa';
 import { useEffect, useState } from 'react';
 import { useGrupoStore } from '@/app/states/grupo/useGetGrupo';
 import Loading from '@/app/loading';
 import { useProduto } from '@/app/states/produto/useProdutos';
-import { AiOutlineArrowLeft, AiOutlineArrowRight } from 'react-icons/ai';
+import {  AiOutlineArrowRight } from 'react-icons/ai';
 import { useCarrinho } from '@/app/states/carrinho/useCart';
 import formatarReal from '@/app/utils/fomatToReal';
 import axios from 'axios';
@@ -19,7 +18,6 @@ import { apiUrl } from '@/app/utils/apiUrl';
 import { useCookies } from 'next-client-cookies';
 import { CarrinhoData } from '../carrinho/page';
 import { BsCart4 } from 'react-icons/bs';
-
 
 export default function Pedidos({ params }: { params: { link: string } }) {
   const route = useRouter()
@@ -64,8 +62,6 @@ export default function Pedidos({ params }: { params: { link: string } }) {
       useGrupo.getState().actions.addEmpresa(grupo)
     }
   }
-
-
 
   return (<>
   <MotionAnimate>

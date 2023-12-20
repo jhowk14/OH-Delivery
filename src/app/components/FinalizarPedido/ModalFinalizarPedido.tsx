@@ -6,7 +6,7 @@ import { useCookies } from 'next-client-cookies';
 import { AiOutlineClose } from "react-icons/ai";
 import { useRouter } from "next/router";
 
-const ModalFinalizarPedido = ({onChange}: {onChange: ()=>void}) => {
+const ModalFinalizarPedido = () => {
   const cookie = useCookies()
   const [open, setOpen] = useState(false);
 
@@ -34,7 +34,6 @@ const ModalFinalizarPedido = ({onChange}: {onChange: ()=>void}) => {
       <div className="">
         <Box className="bg-gray-100 p-4 rounded-lg w-screen h-max">
             <button onClick={()=> {
-              onChange()
               handleClose()
             }} className="p-3 right-0 bg-gray-300 font-bold rounded-full focus:outline-none transition-transform transform hover:scale-125">
             <AiOutlineClose />

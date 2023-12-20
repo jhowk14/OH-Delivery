@@ -111,16 +111,16 @@ return(
       {/* Cart Items */}
       <div className="grid grid-cols-1 mt-4">
             {/* Carrinhos com GrupoTipo */}
-            {carrinhosGrupoTipo.map((carrinho, index) => (
-                <div key={index} className="m-1">
+            {carrinhosGrupoTipo.map((carrinho) => (
+                <div key={carrinho.CarID} className="m-1">
                         <ProdutoGrupoTipo carrinhoData={carrinho} />
                 </div>
             ))}
 
             {/* Carrinhos sem GrupoTipo */}
-            {carrinhosNormal.map((carrinho, index) => 
-                carrinho.CarrinhoItens.map((item, itemIndex) => item.Produto.ProdClassificacao == 0 && (
-                        <div  className="m-1" key={itemIndex}>
+            {carrinhosNormal.map((carrinho) => 
+                carrinho.CarrinhoItens.map((item) => item.Produto.ProdClassificacao == 0 && (
+                        <div  className="m-1" key={item.CarItensID}>
                         <ProdutoNoGrupo carrinhoData={item} total={carrinho.CarValorTotal} />
                         </div>
                 )
@@ -137,7 +137,7 @@ return(
       </div>
       {
         total > 0 && (
-            <ModalFinalizarPedido onChange={()=>router.push(`/${params.link}/pedidos`)}/>
+            <ModalFinalizarPedido />
         )
       }
   </MotionAnimate>

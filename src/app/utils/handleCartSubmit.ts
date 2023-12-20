@@ -3,7 +3,6 @@ import { Carrinho } from "../../../types/Carrinho";
 import { ProdutoSubmit } from "../../../types/Produto";
 import { useEmpresaStore } from "../states/empresa/useEmpresa";
 import { apiUrl } from "./apiUrl";
-import { useCarrinho } from "../states/carrinho/useCart";
 import { CarrinhoData } from "../[link]/carrinho/page";
 
 export default async function handleCartSubmit (produto: Partial<ProdutoSubmit>[], complemento: ProdutoSubmit[], token: string, descricao: string) {
@@ -39,8 +38,8 @@ export default async function handleCartSubmit (produto: Partial<ProdutoSubmit>[
     }
     try {
         const response = await axios.post(`${apiUrl}/carrinhos`, {
-            carrinho: carrinho, // Envie o carrinho como parte do corpo da requisição
-            produtos: produtos, // Envie a lista de produtos como parte do corpo da requisição
+            carrinho: carrinho,
+            produtos: produtos,
         });
         const responseData : CarrinhoData[] = response.data.carrinho
         if (response.status === 200) {

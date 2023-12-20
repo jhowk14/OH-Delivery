@@ -1,6 +1,7 @@
 import { CarrinhoData } from "@/app/[link]/carrinho/page";
 import formatarReal from "./fomatToReal";
 import { usePedido } from "../states/carrinho/usePedido";
+import { Pedido } from "../../../types/pedidos";
 
 export const buildWhatsAppMessage = (carrinhos: CarrinhoData[], total: number, taxa: number, troco: string = '') => {
   const formPedidoState = usePedido.getState().FormPedido;
@@ -85,4 +86,56 @@ export const calcularTotalETaxa = (carrinhos: CarrinhoData[]) => {
   });
 
   return { total, taxa };
+};
+
+export const buildWhatsAppMessagePedido = (pedido: Pedido) => {
+  const messageParts: string[] = [
+    `*👋 Olá! Vim de ${window.location.href}*\n\n`,
+    `Nome: ${pedido.clienteNome}\n`,
+    `Telefone: ${pedido.clienteTelefone}\n`,
+    `Endereço: ${pedido.clienteEndereco} ${pedido.clienteNumero} ${pedido.clienteBairro} ${pedido.clienteCep}\n`,
+    `Método de Pagamento: ${pedido.formaPagamento} ${pedido.clienteTroco ? `${formatarReal(pedido.clienteTroco)}` : ''}\n`,
+  ];
+
+  const pedidoAgrupamento = pedido.itens && pedido.itens.filter(item => item.grupoTipo);
+
+  const pedidoSemAgrupamento = pedido.itens && pedido.itens.filter(item => !item.grupoTipo);
+  let grupo = 0
+  pedidoAgrupamento && pedidoAgrupamento.map((pedido) => {
+    if(grupo != pedido.agrupamento){
+      messageParts.push(`\n*x${pedido.quantidadeAgrupamento}* ${pedido.nomeAgrupamento} *${formatarReal(pedido.valorUnitario * pedido.quantidadeAgrupamento)}*\n`);
+    }
+        messageParts.push(` ${pedido.produto} \n`);
+        if (pedido.complementos && pedido.complementos.length > 0) {
+          pedido.complementos.map((complemento) => {
+            messageParts.push(`    *${complemento.quantidadeComplemento}* ${complemento.produtoComplemento} ${formatarReal(complemento.valorUnitarioComplemento)}\n`);
+          });
+        }
+
+        messageParts.push(`${pedido.observacoes && `    *Obs: ${pedido.observacoes}*\n`}`);
+        grupo = pedido.agrupamento
+    });
+
+    pedidoSemAgrupamento && pedidoSemAgrupamento.map((pedido) => {
+        messageParts.push(`\n *x${pedido.quantidade}* ${pedido.produto} *${formatarReal(pedido.valorUnitario)}*\n`);
+
+        if (pedido.complementos && pedido.complementos.length > 0) {
+          pedido.complementos.map((complemento) => {
+            messageParts.push(`    *${complemento.quantidadeComplemento}* ${complemento.produtoComplemento} ${formatarReal(complemento.valorUnitarioComplemento)}\n`);
+          });
+        }
+
+        messageParts.push(`${pedido.observacoes && `    *Obs: ${pedido.observacoes}*\n`}`);
+    });
+
+
+  if (pedido.taxaEntrega > 0) {
+    messageParts.push(`\nTaxa de entrega: ${formatarReal(pedido.taxaEntrega)}\n`);
+  }
+
+  messageParts.push(`Total: ${formatarReal(pedido.totalPedido)}`);
+
+  const message = messageParts.join('');
+
+  return message;
 };

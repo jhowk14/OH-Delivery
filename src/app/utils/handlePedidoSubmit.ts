@@ -2,6 +2,7 @@ import axios from "axios";
 import { Pedido, PedidoItem, PedidoItemComplemento } from "../../../types/pedidos";
 import { CarrinhoData } from "../[link]/carrinho/page";
 import { apiUrl, apiWhats } from "./apiUrl";
+import { Empresas } from "../../../types/Empresa";
 
 type FormPedido = {
     nome: string;
@@ -22,43 +23,49 @@ type pedidoSubmit = {
   PedidoItens: PedidoItem[]
   PedidoComplementos: PedidoItemComplemento[]
 }
-export const handlePedidoSubmit = async (carrinho: CarrinhoData[], cliente: FormPedido, total: number, empresa: string, taxa: number, cookie: string, message: string) => {
+export const handlePedidoSubmit = async (carrinho: CarrinhoData[], cliente: FormPedido, total: number, empresa: Empresas, taxa: number, cookie: string, message: string) => {
   const complementos: PedidoItemComplemento[] = [];
   const itens: PedidoItem[] = [];
 
+  
   carrinho.forEach((itemCarrinho) => {
     itemCarrinho.CarrinhoItens.forEach((item)=>{
+      if(item.Produto.ProdClassificacao == 0){
+  console.log(item.Produto.Grupo.GrupoTipo?.length)
 
-      const novoItemPedido: PedidoItem = {
-        produto: item.Produto.ProdDescricao,
-        quantidade: item.CarItensQuantidade*1,
-        valorUnitario: item.CarItensValorUnitario,
-        valorProduto: item.CarItensValorProdutos,
-        observacoes: item.CarItensObservacoes,
-        totalComplementos: item.CarItensComplemento,
-        valorTotal: item.CarItensValorTotalGeral,
-        agrupamento: itemCarrinho.CarID*1,
-        prodID: item.Produto.ProdID,
-        quantidadeAgrupamento: itemCarrinho.CarQtd*1
-      };
-  
-      itens.push(novoItemPedido);
-      item.Complemento.forEach(com => {
-        const novoComplemento: PedidoItemComplemento = {
-          produtoComplemento: com.Produto.ProdDescricao,
-          quantidadeComplemento: com.CompQuantidade*1,
-          prodID: item.Produto.ProdID,
-          valorUnitarioComplemento: com.Produto.ProdValor,
-          valorTotalComplemento: (com.Produto.ProdValor*1) * (com.CompQuantidade*1),
-        };
-    
-        complementos.push(novoComplemento);
-      })
+  const novoItemPedido = {
+    produto: item.Produto.ProdDescricao,
+    quantidade: item.CarItensQuantidade*1,
+    valorUnitario: item.CarItensValorUnitario,
+    valorProduto: item.CarItensValorProdutos,
+    observacoes: item.CarItensObservacoes,
+    totalComplementos: item.CarItensComplemento,
+    valorTotal: item.CarItensValorTotalGeral,
+    nomeAgrupamento: itemCarrinho.CarDescricao,
+    grupoTipo: item.Produto.Grupo.GrupoTipo && item.Produto.Grupo.GrupoTipo?.length > 0 ? true : false,
+    agrupamento: itemCarrinho.CarID*1,
+    prodID: item.Produto.ProdID,
+    quantidadeAgrupamento: itemCarrinho.CarQtd*1
+  };
+// @ts-ignore
+  itens.push(novoItemPedido);
+  item.Complemento.forEach(com => {
+    const novoComplemento: PedidoItemComplemento = {
+      produtoComplemento: com.Produto.ProdDescricao,
+      quantidadeComplemento: com.CompQuantidade*1,
+      prodID: item.Produto.ProdID,
+      valorUnitarioComplemento: com.Produto.ProdValor,
+      valorTotalComplemento: (com.Produto.ProdValor*1) * (com.CompQuantidade*1),
+    };
+
+    complementos.push(novoComplemento);
+  })
+}
     })
   });
 
   // Criando o objeto do pedido
-  const pedido: pedidoSubmit = {
+  const pedido = {
     Pedido: {
       clienteBairro: cliente.bairro,
       clienteCep: cliente.cep,
@@ -72,7 +79,8 @@ export const handlePedidoSubmit = async (carrinho: CarrinhoData[], cliente: Form
       clienteTelefone: cliente.telefone,
       dataHora: new Date(),
       dataHoraImportacao: new Date(),
-      empresa: empresa,
+      empresa: empresa.EmprLink,
+      empresaTelefone: empresa.EmprTelefone,
       formaPagamento: cliente.metodo,
       status: 0,
       taxaEntrega: taxa,
@@ -85,7 +93,7 @@ export const handlePedidoSubmit = async (carrinho: CarrinhoData[], cliente: Form
   const response = await axios.post(`${apiUrl}/pedido`,{
     ...pedido
   }, {
-    responseType: 'json', // ou 'json' dependendo do tipo de resposta esperado
+    responseType: 'json',
   })
   if(response.status === 200) {
     await axios.delete(`${apiUrl}/carrinhos/${cookie}`)

@@ -1,4 +1,5 @@
 export type Pedido = {
+  id: string
     empresa: string;
     dataHora: Date;
     totalPedido: number;
@@ -13,9 +14,11 @@ export type Pedido = {
     clienteBairro: string;
     clienteCidade: string;
     clienteEstado: string;
+    empresaTelefone: string;
     clienteTelefone: string;
     status: number;
     dataHoraImportacao: Date;
+    itens: PedidoItem[]
   };
   
   export type PedidoItem = {
@@ -27,8 +30,11 @@ export type Pedido = {
     totalComplementos: number;
     valorTotal: number;
     prodID: number;
+    grupoTipo: boolean
+    nomeAgrupamento: string
     agrupamento: number;
     quantidadeAgrupamento: number
+    complementos: PedidoItemComplemento[]
   };
   
   

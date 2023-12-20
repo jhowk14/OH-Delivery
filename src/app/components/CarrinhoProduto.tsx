@@ -8,10 +8,10 @@ import { apiUrl } from "../utils/apiUrl";
 import { useCookies } from "next-client-cookies";
 import { useCarrinho } from "../states/carrinho/useCart";
 import formatarReal from "../utils/fomatToReal";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Dialog, DialogContent } from "@mui/material";
 
-export default function ProdutoNoGrupo({ carrinhoData, total }: { carrinhoData: CarrinhoItensData, total: number }) {
+const ProdutoNoGrupo = memo(function ProdutoNoGrupo({ carrinhoData, total }: { carrinhoData: CarrinhoItensData, total: number }) {
     const cookies = useCookies()
     const { addCarrinho: setCarrinhoData } = useCarrinho()
     const [qtd, setQtd] = useState(carrinhoData.CarItensQuantidade * 1)
@@ -146,4 +146,6 @@ export default function ProdutoNoGrupo({ carrinhoData, total }: { carrinhoData: 
             </div>
         </MotionAnimate>
     );
-}
+})
+
+export default ProdutoNoGrupo

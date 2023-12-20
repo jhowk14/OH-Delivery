@@ -21,8 +21,6 @@ import handleCartSubmit from "@/app/utils/handleCartSubmit";
 import { useCookies } from "next-client-cookies";
 // @ts-ignore
 import { MotionAnimate } from 'react-motion-animate'
-import ModalAlertPedido from "@/app/components/ModalAlertPedido";
-import { Dialog, DialogContent } from "@mui/material";
 import { useEmpresaStore } from "@/app/states/empresa/useEmpresa";
 
 const client = new QueryClient();
@@ -40,8 +38,8 @@ function GrupoComponent({ params }: { params: { grupo: string, link: string } })
   const [productCounts, setProductCounts] = useState<{ [productId: string]: number }>({});
   const GrupoTipo = useGrupoTipo.getState().state.grupo;
   const [modalObs , setModalObs] = useState(false)
-  const [modalAlert , setModalAlert] = useState(false)
   const [modalComplementos , setModalComplementos] = useState(false)
+  const [addCart , setAddCart] = useState(false)
   const observacoes = useObservacoes.getState().observacoes
   const router = useRouter();
 
@@ -278,17 +276,20 @@ return (
         </div>
       </div>
     </div>
-      {totalCount > 0 && <button
+      {totalCount > 0  && <button
             onClick={async()=>{
-              const descricao = `${useGrupo.getState().state.grupo ? useGrupo.getState().state.grupo?.GrupDescricao : ''} ${useGrupoTipo.getState().state.grupo ? `${useGrupoTipo.getState().state.grupo?.GrTpDescricao} ${totalCount} sabor` : ''}`
-              const { OK }= await handleCartSubmit(useProduto.getState().produtos, useProduto.getState().Complementos, cookies.get('token')!, descricao)
-              if(OK){
-                setModalAlert(true)
-                useObservacoes.getState().resetObs()
-                useProduto.getState().resetComplementos()
-                useProductCounts.setState({productCounts: {}})
+              if(!addCart){
+                setAddCart(true)
+                const descricao = `${useGrupo.getState().state.grupo ? useGrupo.getState().state.grupo?.GrupDescricao : ''} ${useGrupoTipo.getState().state.grupo ? `${useGrupoTipo.getState().state.grupo?.GrTpDescricao} ${totalCount} sabor` : ''}`
+                const { OK } = await handleCartSubmit(useProduto.getState().produtos, useProduto.getState().Complementos, cookies.get('token')!, descricao)
+                if(OK){
+                  router.push(`/${params.link}/pedidos`)
+                  useGrupoTipo.getState().actions.addEmpresa(null)
+                  useObservacoes.getState().resetObs()
+                  useProduto.getState().resetComplementos()
+                  useProductCounts.setState({productCounts: {}})
+                }
               }
-
             }}
               className={`bg-gray-600
                           fixed bottom-0
@@ -305,16 +306,6 @@ return (
               Adicionar ao Carrinho
             </button>
       }
-<Dialog open={modalAlert} onClose={()=>{
-  setModalAlert(false)
-  router.push(`/${params.link}/pedidos`)
-  }} >
-      <DialogContent >
-     <ModalAlertPedido params={params} onClose={()=>{
-      setModalAlert(false)
-    }}/>
-    </DialogContent>
-  </Dialog>
     </MotionAnimate>
     </>
   );

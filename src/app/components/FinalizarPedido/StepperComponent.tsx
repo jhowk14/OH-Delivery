@@ -92,9 +92,9 @@ const StepperComponent = () => {
               color="primary"
               fullWidth
               onClick={async ()=>{
-                const {message} = buildWhatsAppMessage(carrinhos, total*1, taxa*1, FormPedido.valorPago)
-                await handlePedidoSubmit(carrinhos, FormPedido, total*1, useEmpresaStore.getState().empresa?.EmprLink!, taxa*1, cookies.get('token')!, message)
                 handleNext()
+                const {message} = buildWhatsAppMessage(carrinhos, total*1, taxa*1, FormPedido.valorPago)
+                await handlePedidoSubmit(carrinhos, FormPedido, total*1, useEmpresaStore.getState().empresa!, taxa*1, cookies.get('token')!, message)
               }}
             >
               Finalizar
