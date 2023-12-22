@@ -1,10 +1,7 @@
 'use client'
 import { PiBasketBold } from "react-icons/pi";
 import { BiAddToQueue, BiArrowBack, BiCommentAdd, BiCommentCheck } from 'react-icons/bi';
-import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai"
-import { Grupo } from "../../../../../types/Grupos";
 import { useRouter } from "next/navigation";
 import { Produto } from "../../../../../types/Produto";
 import { useGrupoTipo } from "@/app/states/grupo/useGrupoTipo";
@@ -14,7 +11,6 @@ import { useProduto } from "@/app/states/produto/useProdutos";
 import ModalObs from "@/app/components/ModalObs";
 import ModalComplementos from "@/app/components/ModalComplementos";
 import formatarReal from "@/app/utils/fomatToReal";
-import { apiUrl } from "@/app/utils/apiUrl";
 import { useProductCounts } from "@/app/states/produto/useProductCounts";
 import { useObservacoes } from "@/app/states/produto/useObs";
 import handleCartSubmit from "@/app/utils/handleCartSubmit";
@@ -22,18 +18,30 @@ import { useCookies } from "next-client-cookies";
 // @ts-ignore
 import { MotionAnimate } from 'react-motion-animate'
 import { useEmpresaStore } from "@/app/states/empresa/useEmpresa";
+import { getFractionString } from "@/app/utils/getFraction";
+import { useGrupoStore } from "@/app/states/grupo/GruposProd";
 
-const client = new QueryClient();
+export default function Grupo({ params }: { params: { grupo: string, link: string }}) {
+  const { grupos: grupoState, produtos: produtoState, getGrupo, getProdutos } = useGrupoStore.getState()
+  const [grupoData, setGrupoData] = useState(grupoState[params.grupo])
+  const [produtoData, setProdutoData] = useState(produtoState[params.grupo])
 
-export default function Empresa({ params }: { params: { grupo: string, link: string } }) {
-  return (
-    <QueryClientProvider client={client}>
-      <GrupoComponent params={params} />
-    </QueryClientProvider>
-  )
-}
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!grupoState || !grupoState[params.grupo]) {
+        const grupo = await getGrupo(params.grupo)
+        setGrupoData(grupo)
+      }
 
-function GrupoComponent({ params }: { params: { grupo: string, link: string } }) {
+      if (!produtoState || !produtoState[params.grupo]) {
+        const produtos = await getProdutos(params.grupo);
+        setProdutoData(produtos)
+      }
+    };
+
+    fetchData();
+  }, [params.grupo, grupoState, produtoState, getGrupo, getProdutos]);
+
   const cookies = useCookies();
   const [productCounts, setProductCounts] = useState<{ [productId: string]: number }>({});
   const GrupoTipo = useGrupoTipo.getState().state.grupo;
@@ -42,22 +50,6 @@ function GrupoComponent({ params }: { params: { grupo: string, link: string } })
   const [addCart , setAddCart] = useState(false)
   const observacoes = useObservacoes.getState().observacoes
   const router = useRouter();
-
-  const { data: grupoData, isLoading: isGrupoDataLoading } = useQuery<Grupo>({
-    queryKey: [`Grupoid: ${params.grupo}`],
-    queryFn: async () => {
-      const response = await axios.get(`${apiUrl}/grupoid/${params.grupo}`);
-      return response.data;
-    }
-  });
-
-  const { data: produtoData, isLoading: isProdutoDatasLoading } = useQuery<Produto[]>({
-    queryKey: [`Produto ${params.grupo}`],
-    queryFn: async () => {
-      const response = await axios.get(`${apiUrl}/produtos/${params.grupo}`);
-      return response.data;
-    }
-  });
 
   const totalCount = Object.values(productCounts).reduce((total, count) => total + count, 0);
 
@@ -140,18 +132,6 @@ function GrupoComponent({ params }: { params: { grupo: string, link: string } })
     }
   },[GrupoTipo, router, params])
 
-const getFractionString = (countInd: number, divisao: number, id: number) => {
-  if (divisao === 0) {
-    return countInd.toString();
-  }
-  if(countInd == 0){
-    delete productCounts[id]
-    return countInd.toString(); 
-  }
-  const fraction = `${countInd}/${totalCount}`;
-  return fraction;
-};
-
 var produtos = produtoData
 
 if(GrupoTipo){
@@ -192,7 +172,7 @@ return (
                       size={20}
                     />
                   </button>
-                  <p className="px-1 select-none">{getFractionString(productCounts[prod.ProdID] || 0, GrupoTipo?.GrTpDivisao || 0 , prod.ProdID)}</p>
+                  <p className="px-1 select-none">{getFractionString(productCounts[prod.ProdID] || 0, GrupoTipo?.GrTpDivisao || 0 , prod.ProdID,(id)=>delete productCounts[id], totalCount)}</p>
                   <button 
                   onClick={() => {
                     if(GrupoTipo?.GrTpDivisao){

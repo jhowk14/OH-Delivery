@@ -11,7 +11,6 @@ import { useRouter } from "next/navigation";
 import { useGrupoTipo } from "@/app/states/grupo/useGrupoTipo";
 import ModalFinalizarPedido from "@/app/components/FinalizarPedido/ModalFinalizarPedido";
 import { useCarrinho } from "@/app/states/carrinho/useCart";
-import { useEmpresaStore } from "@/app/states/empresa/useEmpresa";
 // @ts-ignore
 import { MotionAnimate } from 'react-motion-animate'
 import ProdutoGrupoTipo from "@/app/components/CarrinhoProdTipo";
@@ -51,10 +50,6 @@ function Carrinhos({ params }: CarrinhoProps) {
     };
     fetchCarrinho();
   }, [cookies, setCarrinhoData]);
-
-useEffect(()=>{
-  useEmpresaStore.getState().getEmpresa(params.link)
-},[params])
  
 var total = 0
 var taxaEntrega = 0

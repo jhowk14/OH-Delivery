@@ -2,14 +2,12 @@ import { AiOutlineClose, AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import formatarReal from "../utils/fomatToReal";
 import { Produto } from "../../../types/Produto";
 import { useProductCounts } from "../states/produto/useProductCounts";
-import { apiUrl } from "../utils/apiUrl";
-import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
 import { GrupoTipo } from "../../../types/GrupoTipo";
 // @ts-ignore
 import { MotionAnimate } from 'react-motion-animate'
 import { useProduto } from "../states/produto/useProdutos";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useGrupoStore } from "../states/grupo/GruposProd";
 
 const ModalComplementos = ({ 
   onClose,
@@ -23,13 +21,19 @@ const ModalComplementos = ({
   GrupoTipo: GrupoTipo | null,
 }) => {
 
-const { data: complementoData, isLoading: isProdutoDataLoading } = useQuery<Produto[]>({
-  queryKey: [`Complementos ${grupoId}`],
-  queryFn: async () => {
-    const response = await axios.get(`${apiUrl}/complementos/${grupoId}`);
-    return response.data;
-  }
-});
+const { complementos ,getComplementos } = useGrupoStore.getState()
+const [complementoData, setComplementoData] = useState(complementos[grupoId])
+
+useEffect(() => {
+  const fetchData = async () => {
+    if (!complementos || !complementos[grupoId]) {
+      const produtos = await getComplementos(grupoId);
+      setComplementoData(produtos)
+    }
+  };
+
+  fetchData();
+}, [grupoId, complementos, getComplementos]);
 
 const { productCounts, incrementCount, decrementCount } = useProductCounts();
 

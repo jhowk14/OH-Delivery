@@ -12,11 +12,11 @@ export async function generateMetadata({ params }: { params: { link: string } })
   try {
     const response = await axios.get(`${apiUrl}/empresa/${params.link}`);
     if (response.status === 200) {
-      const responseData: Empresas = response.data;
-      useEmpresaStore.getState().setEmpresa(responseData)
+      const empresa: Empresas = response.data;
+      useEmpresaStore.getState().setEmpresa(empresa)
       return {
-        title: responseData.EmprNome,
-        description: `Empresa ${responseData.EmprNome}`,
+        title: empresa.EmprNome,
+        description: `Empresa ${empresa.EmprNome}`,
       };
     } else {
       return {
@@ -34,15 +34,17 @@ export async function generateMetadata({ params }: { params: { link: string } })
 }
 
 export default async function RootLayout({ children, params }: { children: React.ReactNode; params: { link: string } }) {
-  try {
-    const response = await axios.get(`${apiUrl}/empresa/${params.link}`);
-    if (response.status === 200) {
-      const responseData: Empresas = response.data;
-      useEmpresaStore.getState().setEmpresa(responseData);
+      let empresa = useEmpresaStore.getState().empresa
+      if(!empresa){
+        empresa = await useEmpresaStore.getState().getEmpresa(params.link)
+        if(!empresa){
+          return <NotFound />
+        }
+      }
 
       return (
         <>
-        <header style={{ backgroundColor: responseData?.CorSite }} className={`p-4 sm:p-6 flex justify-between shadow-2xl shadow-gray-900 items-center`}>
+        <header style={{ backgroundColor: empresa?.CorSite }} className={`p-4 sm:p-6 flex justify-between shadow-2xl shadow-gray-900 items-center`}>
           <Link href={`/${params.link}`}>
             <div className="flex space-x-2 px-10 text-gray-100 hover:text-gray-400">
               <HiHome size={30} />
@@ -59,29 +61,22 @@ export default async function RootLayout({ children, params }: { children: React
       <main className={`min-h-screen flex flex-col bg-gray-100`}>
       {children}
       </main>
-      {responseData && (
+      {empresa && (
     
-      <footer style={{backgroundColor: responseData.CorSite}} className={` p-4 sm:p-6 text-white`}>
-          <div style={{backgroundColor: responseData.CorSite}} className={` rounded-lg p-4 text-xs grid lg:grid-cols-2 mb-16`}>
+      <footer style={{backgroundColor: empresa.CorSite}} className={` p-4 sm:p-6 text-white`}>
+          <div style={{backgroundColor: empresa.CorSite}} className={` rounded-lg p-4 text-xs grid lg:grid-cols-2 mb-16`}>
               <div>
                 <p className="font-bold text-gray-100">Endereço:</p>
-                <p className="text-gray-950">{responseData?.EmprEndereco}, {responseData?.EmprBairro}</p>
-                <p className="text-gray-950">{responseData?.EmprCidade}, {responseData?.EmprNumero}, {responseData?.EmprEstado}</p>
+                <p className="text-gray-950">{empresa?.EmprEndereco}, {empresa?.EmprBairro}</p>
+                <p className="text-gray-950">{empresa?.EmprCidade}, {empresa?.EmprNumero}, {empresa?.EmprEstado}</p>
               </div>
               <div>
                 <p className="font-bold text-gray-100">Telefone:</p>
-                <p className="text-gray-950">{responseData?.EmprTelefone}</p>
+                <p className="text-gray-950">{empresa?.EmprTelefone}</p>
               </div>
             </div>
         </footer>
       )}
       </>
       );
-    } else {
-      return <NotFound />;
-    }
-  } catch (error) {
-    console.error('Error fetching empresa data:', error);
-    return <NotFound />;
-  }
 }

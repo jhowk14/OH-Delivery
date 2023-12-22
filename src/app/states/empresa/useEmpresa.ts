@@ -7,8 +7,8 @@ type EmpresaState = {
   empresa: Empresas | null;
   error: string | null;
   isLoading: boolean;
-  getEmpresa: (link: string) => void;
-  setEmpresa: (empresa: Empresas | null) => void; // New function to set empresa
+  getEmpresa: (link: string) => Promise<Empresas | null>; // Return type updated
+  setEmpresa: (empresa: Empresas | null) => void;
 };
 
 export const useEmpresaStore = create<EmpresaState>((set) => ({
@@ -19,10 +19,13 @@ export const useEmpresaStore = create<EmpresaState>((set) => ({
     set({ isLoading: true });
     try {
       const response = await axios.get(`${apiUrl}/empresa/${link}`);
-      set({ empresa: response.data, isLoading: false });
+      const empresaData: Empresas = response.data;
+      set({ empresa: empresaData, isLoading: false });
+      return empresaData; // Return the empresa after successful fetch
     } catch (error) {
       set({ error: 'Erro ao buscar a empresa', isLoading: false });
+      return null; // Return null in case of error
     }
   },
-  setEmpresa: (novaEmpresa) => set({ empresa: novaEmpresa }), // Implementation of setEmpresa
+  setEmpresa: (novaEmpresa) => set({ empresa: novaEmpresa }),
 }));

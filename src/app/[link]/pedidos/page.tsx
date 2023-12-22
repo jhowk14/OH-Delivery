@@ -28,10 +28,9 @@ export default function Pedidos({ params }: { params: { link: string } }) {
   useProduto.getState().resetProdutos()
   const [cart, setCart] = useState<CarrinhoData[]>([])
 
-  var total = 0
-  cart.forEach((a)=>{
-  total = a.CarQtd ? total + (a.CarValorTotal * 1)*a.CarQtd : total + (a.CarValorTotal * 1)
-})
+  const calculateTotal = (cart: CarrinhoData[]) => {
+    return cart.reduce((acc, item) => acc + (item.CarQtd ? item.CarValorTotal * item.CarQtd : item.CarValorTotal), 0);
+  };
 
   useEffect(()=>{
     if(empresa){
@@ -90,7 +89,7 @@ export default function Pedidos({ params }: { params: { link: string } }) {
       onClick={()=>route.push(`/${params.link}/carrinho`)}
           className="bg-gray-600 fixed bottom-0 w-full text-base opacity-80 text-gray-100 py-3 px-4 mt-2 lg:mt-0 focus:outline-none transition-transform transform hover:scale-105"
       >
-        <span className='font-semibold flex justify-center gap-4 items-center'><BsCart4 size={20}/> Total: {formatarReal(total)} <AiOutlineArrowRight size={20}/></span>
+        <span className='font-semibold flex justify-center gap-4 items-center'><BsCart4 size={20}/> Total: {formatarReal(calculateTotal(cart))} <AiOutlineArrowRight size={20}/></span>
       </button>
       )}
   </MotionAnimate>

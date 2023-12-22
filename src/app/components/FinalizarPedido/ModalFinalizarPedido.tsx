@@ -4,7 +4,6 @@ import StepperComponent from "./StepperComponent";
 import { useCarrinho } from "@/app/states/carrinho/useCart";
 import { useCookies } from 'next-client-cookies';
 import { AiOutlineClose } from "react-icons/ai";
-import { useRouter } from "next/router";
 
 const ModalFinalizarPedido = () => {
   const cookie = useCookies()

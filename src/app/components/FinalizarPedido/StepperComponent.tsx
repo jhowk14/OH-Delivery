@@ -1,6 +1,6 @@
 'use client'
 import { FaClipboardCheck } from "react-icons/fa6";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Alert,
   Button,
@@ -9,7 +9,7 @@ import {
   Stepper
 } from "@mui/material";
 import { IoMdPerson } from "react-icons/io";
-import { BsBagCheckFill, BsTelephoneFill } from "react-icons/bs";
+import { BsTelephoneFill } from "react-icons/bs";
 import { FaMapMarkerAlt, FaCreditCard, FaMapPin } from "react-icons/fa";
 import Endereco from "./FormEndereco";
 import Dados from "@/app/components/FinalizarPedido/FormDados";
@@ -102,7 +102,7 @@ const StepperComponent = () => {
           </div>
         </div>
         );
-      // Adicione mais casos conforme necessário para outros passos
+
       default:
         return "Erro: Etapa desconhecida";
     }

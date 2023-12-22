@@ -2,7 +2,7 @@
 import { FaCheck, FaStore, FaClipboardList, FaMapMarkerAlt } from 'react-icons/fa';
 import { apiUrl } from '@/app/utils/apiUrl';
 import axios from 'axios';
-import { useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 import formatarReal from '../../../utils/fomatToReal';
 import { MdDeliveryDining } from 'react-icons/md';
 import { PiCookingPotBold } from 'react-icons/pi';
@@ -44,7 +44,6 @@ export default function Pedidos({ params }: { params: { pedido: string } }) {
     return () => clearInterval(intervalId);
   }, [getPedidoById]);
 
-
   const steps = [
     { title: 'Pedido Confirmado', icon: <FaClipboardList size={20} />, status: 1 },
     { title: 'Pedido Recebido', icon: <FaStore size={20} />, status: 2 },
@@ -53,8 +52,8 @@ export default function Pedidos({ params }: { params: { pedido: string } }) {
   ];
 
   const renderStep = (step: { title: string; icon: JSX.Element; status: number }, index: number) => (
-    <>
-      <li key={step.title} className='px-1'>
+    <Fragment key={step.title}>
+      <li className='px-1'>
         <div
           className={`p-2 ${
             pedido &&
@@ -64,10 +63,10 @@ export default function Pedidos({ params }: { params: { pedido: string } }) {
           {pedido && pedido?.status < step.status ? step.icon : <FaCheck size={20} />}
         </div>
       </li>
-      {index < steps.length - 1 && <div key={step.title} className={`h-[2px] w-full ${pedido && pedido?.status < step.status ? "bg-gray-200" : "bg-green-400 animate-pulse"}  items-center m-2`}></div>}
-    </>
+      {index < steps.length - 1 && <div className={`h-[2px] w-full ${pedido && pedido?.status < step.status ? "bg-gray-200" : "bg-green-400 animate-pulse"}  items-center m-2`}></div>}
+    </Fragment>
   );
-
+const totalGeral = (pedido?.taxaEntrega || 0)*1+(pedido?.totalPedido || 0)*1
   return (
     <>
       <div className='mx-3 py-4 px-2 mt-10 bg-gray-200 shadow-md shadow-gray-400'>
@@ -90,8 +89,8 @@ export default function Pedidos({ params }: { params: { pedido: string } }) {
                   </div>
                   <div>
                     <p className="flex items-center gap-3">Forma de Pagamento: {pedido?.formaPagamento}</p>
-                    {pedido?.clienteTroco && <p className="flex items-center gap-3">Troco: {formatarReal(pedido?.clienteTroco)} </p>}
-                    <p className="flex items-center gap-3">Total Pedido: {formatarReal(pedido?.totalPedido || 0)}</p>
+                    {pedido?.clienteTroco && <p className="flex items-center gap-3">Troco: {formatarReal(pedido?.clienteTroco-totalGeral)} </p>}
+                    <p className="flex items-center gap-3">Total Pedido: {formatarReal(totalGeral)}</p>
                   </div>
                 </div>
               </div>
