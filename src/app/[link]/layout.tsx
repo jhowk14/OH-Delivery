@@ -25,7 +25,6 @@ export async function generateMetadata({ params }: { params: { link: string } })
       };
     }
   } catch (error) {
-    console.error('Error fetching metadata:', error);
     return {
       title: 'OH Delivery',
       description: 'Home',

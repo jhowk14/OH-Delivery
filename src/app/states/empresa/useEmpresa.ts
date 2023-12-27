@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create,  Mutate } from 'zustand';
 import axios from 'axios';
 import { Empresas } from '../../../../types/Empresa';
 import { apiUrl } from '@/app/utils/apiUrl';
