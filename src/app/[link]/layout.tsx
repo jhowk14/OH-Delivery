@@ -7,10 +7,15 @@ import { Metadata } from 'next';
 import { apiUrl } from '../utils/apiUrl';
 import { useEmpresaStore } from '../states/empresa/useEmpresa';
 import NotFound from '../not-found';
+import { cookies } from 'next/headers';
 
 export async function generateMetadata({ params }: { params: { link: string } }): Promise<Metadata> {
   try {
-    const response = await axios.get(`${apiUrl}/empresa/${params.link}`);
+    const response = await axios.get(`${apiUrl}/empresa/${params.link}`,{
+      headers:{
+          Authorization: `Bearer ${cookies().get('token')?.value}`
+      }
+    });
     if (response.status === 200) {
       const empresa: Empresas = response.data;
       useEmpresaStore.getState().setEmpresa(empresa)

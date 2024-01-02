@@ -22,12 +22,12 @@ import { BsCart4 } from 'react-icons/bs';
 export default function Pedidos({ params }: { params: { link: string } }) {
   const route = useRouter()
   const cookies = useCookies();
+  const token = cookies.get('token')
   const {empresa,error,getEmpresa,isLoading} = useEmpresaStore()
   const { error: errorGrupo, getGrupo, grupo: grupoData, isLoading: isLoadingGrupo} = useGrupoStore()
   useProduto.getState().resetComplementos()
   useProduto.getState().resetProdutos()
   const [cart, setCart] = useState<CarrinhoData[]>([])
-
   const calculateTotal = (cart: CarrinhoData[]) => {
     return cart.reduce((acc, item) => acc + (item.CarQtd ? item.CarValorTotal * item.CarQtd : item.CarValorTotal), 0);
   };
@@ -44,12 +44,16 @@ export default function Pedidos({ params }: { params: { link: string } }) {
 
   useEffect(()=>{
     const getCarrinho = async ()=>{
-        const response = await axios.get(`${apiUrl}/carrinhos/${cookies.get('token')}`);
+        const response = await axios.get(`${apiUrl}/carrinhos/${token}`,{
+          headers:{
+              Authorization: `Bearer ${token}`
+          }
+        });
         useCarrinho.getState().addCarrinho(response.data)
         setCart(response.data)
     }
     getCarrinho()
-  },[cookies])
+  },[token])
 
   const handleGrupo = (grupo: Grupo) => {
     if(grupo?.GrupoTipo?.length == 0){
@@ -64,7 +68,7 @@ export default function Pedidos({ params }: { params: { link: string } }) {
 
   return (<>
   <MotionAnimate>
-      <div className="flex-1 mt-1 lg:mx-20">
+      <div className="flex-1 mt-1 lg:mx-20zzzz">
       <div className="lg:rounded-lg p-5 flex justify-center items-center flex-col">
         <h3 className="font-bold text-lg flex gap-2 bg-gray-800 px-3 py-1 mt-1 w-full justify-center rounded-xl text-gray-100 items-center">Pedido <PiBasketBold /></h3>
         <div className=" rounded-lg p-5 mt-4 w-full">

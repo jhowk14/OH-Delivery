@@ -21,6 +21,7 @@ import { handlePedidoSubmit } from "@/app/utils/handlePedidoSubmit";
 import { useEmpresaStore } from "@/app/states/empresa/useEmpresa";
 import Metodo from "./Metodo";
 import { useCookies } from 'next-client-cookies';
+import Loading from "@/app/loading";
 
 const steps = [<IoMdPerson size={25} key={0}/>, <FaMapMarkerAlt  size={25} key={1}/>, <FaCreditCard size={25} key={2}/> , <FaClipboardCheck size={25} key={3}/>];
 
@@ -30,7 +31,7 @@ const StepperComponent = () => {
   const { carrinhos } = useCarrinho()
   const [total, setTotal] = useState(0)
   const [taxa, setTaxa] = useState(0)
-
+  const [responsePedido, setResponsePedido] = useState<boolean | null>(null);
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
@@ -61,7 +62,7 @@ const StepperComponent = () => {
     case 3:
         return (
         <div>
-          <div className="m-3 gap-2 bg-gray-300 p-3 rounded-md shadow-md shadow-gray-400">
+          <div className="m-3 gap-2 bg-gray-100 p-3 rounded shadow-sm shadow-gray-400">
             <h3 className="flex items-center gap-3"><IoMdPerson />{FormPedido.nome}</h3>
             <h3 className="flex items-center gap-3"><BsTelephoneFill size={13} />{FormPedido.telefone}</h3>
             <h3><span className="font-bold text-xs">CEP</span> {FormPedido.cep}</h3>
@@ -94,7 +95,8 @@ const StepperComponent = () => {
               onClick={async ()=>{
                 handleNext()
                 const {message} = buildWhatsAppMessage(carrinhos, total*1, taxa*1, FormPedido.valorPago)
-                await handlePedidoSubmit(carrinhos, FormPedido, total*1, useEmpresaStore.getState().empresa!, taxa*1, cookies.get('token')!, message)
+                const {OK} = await handlePedidoSubmit(carrinhos, FormPedido, total*1, useEmpresaStore.getState().empresa!, taxa*1, cookies.get('token')!, message)
+                setResponsePedido(OK)
               }}
             >
               Finalizar
@@ -113,7 +115,7 @@ const StepperComponent = () => {
     <div className="flex justify-center my-2">
     <Stepper activeStep={activeStep} variant="elevation" alternativeLabel>
     {steps.map((label, index) => (
-      <Step key={index}>
+      <Step key={index} >
           <StepLabel className={`text-xs`}>
             {label as React.ReactNode}
           </StepLabel>
@@ -124,15 +126,18 @@ const StepperComponent = () => {
   <div className="mx-auto max-w-md">
     {activeStep === steps.length ? (
           <div className="text-center flex justify-center items-center">
-            <Alert severity="success">
-            Pedido Enviado Com Sucesso.
-            Confirme via WhatsApp
+            {
+              responsePedido == null ? <Loading /> : (
+            <Alert severity={responsePedido ? `success`: `error`}>
+            {responsePedido ? `Pedido Enviado Com Sucesso.
+            Confirme via WhatsApp` : `Erro ao enviar pedido porfavor tente novamente mais tarde`}
           </Alert>
+              ) 
+            }
           </div>
         ) : (
           <div 
         >
-
         {getStepContent(activeStep)}
       </div>
     )}

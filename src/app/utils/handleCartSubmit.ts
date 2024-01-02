@@ -40,7 +40,11 @@ export default async function handleCartSubmit (produto: Partial<ProdutoSubmit>[
         const response = await axios.post(`${apiUrl}/carrinhos`, {
             carrinho: carrinho,
             produtos: produtos,
-        });
+        },{
+            headers:{
+                Authorization: `Bearer ${localStorage.getItem('token')?.toString()}`
+            }
+          });
         const responseData : CarrinhoData[] = response.data.carrinho
         if (response.status === 200) {
             return {carrinho: {...responseData}, OK: true}

@@ -26,7 +26,11 @@ export const useGrupoStore = create<GrupoState>((set) => ({
   getGrupo: async (grupoId) => {
     set({ isLoadingGrupo: true });
     try {
-      const response = await axios.get(`${apiUrl}/grupoid/${grupoId}`);
+      const response = await axios.get(`${apiUrl}/grupoid/${grupoId}`,{
+        headers:{
+            Authorization: `Bearer ${localStorage.getItem('token')?.toString()}`
+        }
+      });
       const novoGrupo = { [grupoId]: response.data };
       set((state) => ({ grupos: { ...state.grupos, ...novoGrupo }, isLoadingGrupo: false }));
       return response.data;
@@ -38,7 +42,11 @@ export const useGrupoStore = create<GrupoState>((set) => ({
   getProdutos: async (grupoId) => {
     set({ isLoadingProdutos: true });
     try {
-      const response = await axios.get(`${apiUrl}/produtos/${grupoId}`);
+      const response = await axios.get(`${apiUrl}/produtos/${grupoId}`,{
+        headers:{
+            Authorization: `Bearer ${localStorage.getItem('token')?.toString()}`
+        }
+      });
       const novoProdutos = { [grupoId]: response.data };
       set((state) => ({ produtos: { ...state.produtos, ...novoProdutos }, isLoadingProdutos: false }));
       return response.data;
@@ -50,7 +58,11 @@ export const useGrupoStore = create<GrupoState>((set) => ({
   getComplementos: async (grupoId) => {  // Adicione a função para obter complementos
     set({ isLoadingComplementos: true });
     try {
-      const response = await axios.get(`${apiUrl}/complementos/${grupoId}`);
+      const response = await axios.get(`${apiUrl}/complementos/${grupoId}`,{
+        headers:{
+            Authorization: `Bearer ${localStorage.getItem('token')?.toString()}`
+        }
+      });
       const novoComplementos = { [grupoId]: response.data };
       set((state) => ({ complementos: { ...state.complementos, ...novoComplementos }, isLoadingComplementos: false }));
       return response.data;

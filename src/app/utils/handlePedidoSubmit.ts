@@ -31,7 +31,6 @@ export const handlePedidoSubmit = async (carrinho: CarrinhoData[], cliente: Form
   carrinho.forEach((itemCarrinho) => {
     itemCarrinho.CarrinhoItens.forEach((item)=>{
       if(item.Produto.ProdClassificacao == 0){
-  console.log(item.Produto.Grupo.GrupoTipo?.length)
 
   const novoItemPedido = {
     produto: item.Produto.ProdDescricao,
@@ -47,7 +46,8 @@ export const handlePedidoSubmit = async (carrinho: CarrinhoData[], cliente: Form
     prodID: item.Produto.ProdID,
     quantidadeAgrupamento: itemCarrinho.CarQtd*1
   };
-// @ts-ignore
+
+  // @ts-ignore
   itens.push(novoItemPedido);
   item.Complemento.forEach(com => {
     const novoComplemento: PedidoItemComplemento = {
@@ -92,22 +92,43 @@ export const handlePedidoSubmit = async (carrinho: CarrinhoData[], cliente: Form
 
   const response = await axios.post(`${apiUrl}/pedido`,{
     ...pedido
-  }, {
-    responseType: 'json',
+  },{
+    headers:{
+        Authorization: `Bearer ${localStorage.getItem('token')?.toString()}`
+    }
   })
   if(response.status === 200) {
-    await axios.delete(`${apiUrl}/carrinhos/${cookie}`)
+    await axios.delete(`${apiUrl}/carrinhos/${cookie}`,{
+      headers:{
+          Authorization: `Bearer ${localStorage.getItem('token')?.toString()}`
+      }
+    })
+  }else if(response.status !== 200){
+    return {OK: false};
   }
 
-  await axios.post(`${apiWhats}/message`,{
-    number: `55${cliente.telefone.replace(/[^0-9]/g, '').trim()}`,
-    message: message
-  })
+  const pedidoSubmitAPI = async () =>{
+    try{
+      const message1 = await axios.post(`${apiWhats}/message`,{
+       number: `55${cliente.telefone.replace(/[^0-9]/g, '').trim()}`,
+       message: message
+     })
+     
+     const message2 = await axios.post(`${apiWhats}/message`,{
+       number: `55${cliente.telefone.replace(/[^0-9]/g, '').trim()}`,
+       message: `Clique no link para confirmar o Pedido http://${window.location.href.split('/')[2]}/${window.location.href.split('/')[3]}/checkout/${response.data.pedido.id}`
+     })
+     if(message2.status != 200 || message1.status != 200){
+      await axios.delete(`${apiUrl}/pedido/${response.data.pedido.id}`)
+      return false
+     }
+      return true
+    }catch(e){
+      return false
+    }
+}
 
-  await axios.post(`${apiWhats}/message`,{
-    number: `55${cliente.telefone.replace(/[^0-9]/g, '').trim()}`,
-    message: `Clique no link para confirmar o Pedido http://${window.location.href.split('/')[2]}/${window.location.href.split('/')[3]}/checkout/${response.data.pedido.id}`
-  })
+const responsepedidoSubmit = await pedidoSubmitAPI()
 
-  return{data: response.data, conteudo: {...pedido}};
+  return{data: response.data, conteudo: {...pedido}, OK: responsepedidoSubmit};
 };

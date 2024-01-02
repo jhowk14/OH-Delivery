@@ -17,7 +17,11 @@ export const useGrupoStore = create<GrupoState>((set) => ({
   getGrupo: async (id) => {
     set({ isLoading: true });
     try {
-      const response = await axios.get(`${apiUrl}/grupo/${id}`);
+      const response = await axios.get(`${apiUrl}/grupo/${id}`,{
+        headers:{
+            Authorization: `Bearer ${localStorage.getItem('token')?.toString()}`
+        }
+      });
       set({ grupo: response.data, isLoading: false });
     } catch (error) {
       set({ error: 'Error fetching the group', isLoading: false });

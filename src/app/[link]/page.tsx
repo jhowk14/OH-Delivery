@@ -10,7 +10,6 @@ import { useEmpresaStore } from '../states/empresa/useEmpresa';
 import useVerificarIntervalo from '../hooks/verifyInterval';
 import { useEffect, useState } from "react";
 
-
 export default function Empresa({ params }: { params: { link: string } }) {
   const cookies = useCookies();
   const { empresa: EmpresaData, getEmpresa } = useEmpresaStore.getState();
@@ -36,6 +35,7 @@ export default function Empresa({ params }: { params: { link: string } }) {
     try {
       const Existstoken = cookies.get('token');
       if (Existstoken) {
+        localStorage.setItem("token", Existstoken);
         router.push(`/${empresa?.EmprLink}/pedidos`);
       } else {
         const dataAtual = new Date();
@@ -47,6 +47,7 @@ export default function Empresa({ params }: { params: { link: string } }) {
           path: `/${empresa?.EmprLink}`,
           expires: dataUmaHoraAFrente,
         });
+        localStorage.setItem("token", token.data.token);
       }
       router.push(`/${empresa?.EmprLink}/pedidos`);
     } catch (e) {

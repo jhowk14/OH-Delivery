@@ -16,7 +16,7 @@ const ProdutoGrupoTipo = memo(function ProdutoGrupoTipo({ carrinhoData }: { carr
   const cookies = useCookies()
   const { addCarrinho: setCarrinhoData} = useCarrinho()
   const [quantidade, setQuantidade] = useState(carrinhoData.CarQtd);
-
+  const token = cookies.get('token')
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
@@ -30,8 +30,16 @@ const ProdutoGrupoTipo = memo(function ProdutoGrupoTipo({ carrinhoData }: { carr
   const confirmExcluirPedido = async () => {
     handleClose(); // Close the confirmation dialog
     try {
-      await axios.delete(`${apiUrl}/carrinhoID/${carrinhoData.CarID}`);
-      const response = await axios.get(`${apiUrl}/carrinhos/${cookies.get('token')}`);
+      await axios.delete(`${apiUrl}/carrinhoID/${carrinhoData.CarID}`,{
+        headers:{
+            Authorization: `Bearer ${token}`
+        }
+      });
+      const response = await axios.get(`${apiUrl}/carrinhos/${token}`,{
+        headers:{
+            Authorization: `Bearer ${token}`
+        }
+      });
       setCarrinhoData(response.data);
     } catch (error) {
       console.error("Erro ao excluir pedido:", error);
@@ -58,8 +66,16 @@ const decrementQuantidade = async () => {
         carrinho: {
             CarID: carrinhoData.CarID
         },
+    },{
+      headers:{
+          Authorization: `Bearer ${token}`
+      }
     });
-    const response = await axios.get(`${apiUrl}/carrinhos/${cookies.get('token')}`);
+    const response = await axios.get(`${apiUrl}/carrinhos/${token}`,{
+      headers:{
+          Authorization: `Bearer ${token}`
+      }
+    });
     setCarrinhoData(response.data);
 };
 

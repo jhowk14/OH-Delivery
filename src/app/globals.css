@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.custom-bounce {
+    animation: custom-bounce 0.5s infinite alternate;
+  }
+  
+  @keyframes custom-bounce {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(-3px); /* Ajuste a altura do salto aqui */
+    }
+  }

@@ -16,7 +16,7 @@ const ProdutoNoGrupo = memo(function ProdutoNoGrupo({ carrinhoData, total }: { c
     const { addCarrinho: setCarrinhoData } = useCarrinho()
     const [qtd, setQtd] = useState(carrinhoData.CarItensQuantidade * 1)
     const [open, setOpen] = useState(false);
-
+    const token = cookies.get('token')
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -52,19 +52,39 @@ const ProdutoNoGrupo = memo(function ProdutoNoGrupo({ carrinhoData, total }: { c
                 CarID: carrinhoData.CarItensCarrrinhoID,
                 CarValorTotal: oldValue + newTotal,
             },
-        });
-        const response = await axios.get(`${apiUrl}/carrinhos/${cookies.get('token')}`);
+        },{
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+          });
+        const response = await axios.get(`${apiUrl}/carrinhos/${token}`,{
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+          });
         setCarrinhoData(response.data);
     };
 
     const excluirItem = async () => {
         handleClose()
         try {
-            await axios.delete(`${apiUrl}/carrinhoItens/${carrinhoData.CarItensID}`);
+            await axios.delete(`${apiUrl}/carrinhoItens/${carrinhoData.CarItensID}`,{
+                headers:{
+                    Authorization: `Bearer ${token}`
+                }
+              });
             await axios.put(`${apiUrl}/carrinhos/${carrinhoData.CarItensCarrrinhoID}`, {
                 CarValorTotal: total * 1 - carrinhoData.CarItensValorTotalGeral * 1
-            })
-            const response = await axios.get(`${apiUrl}/carrinhos/${cookies.get('token')}`);
+            },{
+                headers:{
+                    Authorization: `Bearer ${token}`
+                }
+              })
+            const response = await axios.get(`${apiUrl}/carrinhos/${token}`,{
+                headers:{
+                    Authorization: `Bearer ${token}`
+                }
+              });
             setCarrinhoData(response.data);
         } catch (error) {
             console.error("Erro ao excluir pedido:", error);

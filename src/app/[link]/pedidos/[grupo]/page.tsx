@@ -155,7 +155,7 @@ return (
         </h3>
         <div className="mt-3 w-full lg:mx-30">
         {produtos?.map((prod: Produto) => (
-            <div key={prod.ProdID} className="text-lg text-gray-800 rounded-lg items-center bg-gray-100 px-3 lg:mb-3 mb-4">
+            <div key={prod.ProdID} className="text-lg text-gray-800 rounded p-1 items-center bg-gray-100 px-3 mb-1">
               <div className="flex justify-between mb-1">
                 <p className="">{prod.ProdDescricao}</p>
                 <p className="text-sm px-5">{formatarReal((prod.ValoresTipo.find(p => p.PrVtGrTpID === GrupoTipo?.GrTpID)?.PrVtValor || prod.ProdValor))}</p>

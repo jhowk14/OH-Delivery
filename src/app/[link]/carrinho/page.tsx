@@ -37,19 +37,23 @@ interface CarrinhoProps {
 function Carrinhos({ params }: CarrinhoProps) {
   const router = useRouter()
   const {carrinhos: carrinhoData, addCarrinho: setCarrinhoData} = useCarrinho()
-
   const cookies = useCookies();
+  const token = cookies.get('token')
   useEffect(() => {
     const fetchCarrinho = async () => {
       try {
-            const response = await axios.get(`${apiUrl}/carrinhos/${cookies.get('token')}`);
+            const response = await axios.get(`${apiUrl}/carrinhos/${token}`,{
+              headers:{
+                  Authorization: `Bearer ${token}`
+              }
+            });
             setCarrinhoData(response.data);
       } catch (error) {
             console.error("Erro ao buscar carrinhos:", error);
       }
     };
     fetchCarrinho();
-  }, [cookies, setCarrinhoData]);
+  }, [cookies, setCarrinhoData, token]);
  
 var total = 0
 var taxaEntrega = 0
@@ -77,16 +81,24 @@ useEffect(() => {
     if (c.CarrinhoItens.length <= 0 || !c.CarrinhoItens.some(item => item.Produto.ProdClassificacao === 0)) {
       try {
         // Delete the cart
-        await axios.delete(`${apiUrl}/carrinhoID/${c.CarID}`);
+        await axios.delete(`${apiUrl}/carrinhoID/${c.CarID}`,{
+          headers:{
+              Authorization: `Bearer ${token}`
+          }
+        });
         // Fetch updated cart data
-        const response = await axios.get(`${apiUrl}/carrinhos/${cookies.get('token')}`);
+        const response = await axios.get(`${apiUrl}/carrinhos/${token}`,{
+          headers:{
+              Authorization: `Bearer ${token}`
+          }
+        });
         setCarrinhoData(response.data);
       } catch (error) {
         console.error("Erro ao excluir pedido:", error);
       }
     }
   });
-}, [carrinhoData, setCarrinhoData, cookies]);
+}, [carrinhoData, setCarrinhoData, token]);
 
 return(
   <MotionAnimate>
@@ -109,7 +121,7 @@ return(
             {carrinhosGrupoTipo.map((carrinho) => (
                 <div key={carrinho.CarID} className="m-1">
                         <ProdutoGrupoTipo carrinhoData={carrinho} />
-                </div>
+                </div>                       
             ))}
 
             {/* Carrinhos sem GrupoTipo */}
