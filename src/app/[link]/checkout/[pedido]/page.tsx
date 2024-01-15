@@ -11,9 +11,13 @@ import { BsTelephoneFill } from 'react-icons/bs';
 import Image from 'next/image';
 import { buildWhatsAppMessagePedido } from '@/app/utils/MessageWhasapp';
 import { Pedido } from '../../../../../types/pedidos';
+import { renderImage } from '@/app/utils/renderImage';
+import { useEmpresaStore } from '@/app/states/empresa/useEmpresa';
+import { Empresas } from '../../../../../types/Empresa';
 
-export default function Pedidos({ params }: { params: { pedido: string } }) {
+export default function Pedidos({ params }: { params: { pedido: string,link: string } }) {
   const [pedido, setPedido] = useState<Pedido | null>(null);
+  const [empresa, setEmpresa] = useState<Empresas | null>(null);
 
   const getPedidoById = useCallback(async () => {
     try {
@@ -31,6 +35,15 @@ export default function Pedidos({ params }: { params: { pedido: string } }) {
     }
   }, [params.pedido, pedido]);
 
+useEffect(() => {
+  setEmpresa(useEmpresaStore.getState().empresa)
+  const fetchData = async () => {
+    if(!empresa){
+      setEmpresa(await useEmpresaStore.getState().getEmpresa(params.link))
+    }
+  }
+  fetchData()
+},[empresa, params])
   useEffect(() => {
     // Initial fetch
     getPedidoById();
@@ -66,10 +79,16 @@ export default function Pedidos({ params }: { params: { pedido: string } }) {
       {index < steps.length - 1 && <div className={`h-[2px] w-full ${pedido && pedido?.status < step.status ? "bg-gray-200" : "bg-green-400 animate-pulse"}  items-center m-2`}></div>}
     </Fragment>
   );
+
+  const imageLogo = empresa?.EmprLogotipo ? renderImage(empresa?.EmprLogotipo!) : ''
+
 const totalGeral = (pedido?.taxaEntrega || 0)*1+(pedido?.totalPedido || 0)*1
   return (
     <>
-      <div className='mx-3 py-4 px-2 mt-10 shadow-sm shadow-gray-400'>
+    <div className='mx-3 py-4 mt-8 px-2 items-center flex justify-center'>
+      <Image src={imageLogo} width={130} height={130} alt="logo da empresa" />
+    </div>
+      <div className='mx-3 py-4 px-2 bg-gray-50' >
           <div>
             <div className="col-span-full mb-4 p-2">
               <h2 className='font-semibold text-center m-2'>{steps.find(s => s.status == pedido?.status)?.title}</h2>
@@ -98,17 +117,15 @@ const totalGeral = (pedido?.taxaEntrega || 0)*1+(pedido?.totalPedido || 0)*1
           </div>
       </div>
       {pedido && (
-        <div className='flex justify-center'>
       <button
-        className="bg-green-500 m-2 bottom-0 fixed text-lg text-gray-50 py-3 px-4 rounded-lg custom-bounce"
+        className="bg-green-500 bottom-0 fixed text-gray-50 w-full py-2 px-3"
         onClick={async() => {
             const message = buildWhatsAppMessagePedido(pedido)
             window.open(`https://wa.me/${pedido.empresaTelefone}?text=${encodeURIComponent(message)}`, '_blank');
         }}
       >
-        <span className='font-semibold flex justify-center text-xl gap-4 items-center'>Falar com restaurante <Image src='/images/icoWhatsapp.png' height={40} width={40} alt='whatsapp'/></span>
+        <span className='font-semibold flex justify-center gap-4 items-center px-3 custom-bounce'>Falar com restaurante <Image src='/images/icoWhatsapp.png' height={40} width={40} alt='whatsapp'/></span>
       </button>
-        </div>
       )
       }
     </>

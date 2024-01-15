@@ -86,7 +86,7 @@ export default function Pedidos({ params }: { params: { link: string } }) {
           </div>
         </div>
       </div>
-      </div>
+      </div> 
       {cart.length > 0 && 
       (
       <button 
